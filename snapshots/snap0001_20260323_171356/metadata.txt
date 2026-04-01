@@ -1,0 +1,21 @@
+Snapshot ID: snap0001_20260323_171356
+Snap Number: 1
+Timestamp: 20260323_171356
+Datetime: 2026-03-23 17:13:56
+Image Width: 176
+Image Height: 132
+Illumination Temperature: 20.0
+
+Amplitude Stats:
+  Min: 75
+  Max: 4155
+  Mean: 1612.32
+  Std: 1045.48
+
+Distance Stats:
+  Min: 977
+  Max: 1777
+  Mean: 1414.26
+  Std: 166.29
+
+Valid points: 23232

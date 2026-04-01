@@ -1,0 +1,22 @@
+import sys
+sys.path.insert(0, '.')
+
+from crate_vision.pipeline import process_depth_layers
+
+# Replace with your snapshot path
+snapshot_path = "snapshots\snap0001_20260323_171356"
+
+print(f"Processing snapshot: {snapshot_path}")
+result = process_depth_layers(snapshot_path)
+
+print(f"\n✅ Results:")
+print(f"  Snapshot ID: {result.get('snap_id')}")
+print(f"  Crates detected: {len(result.get('crates', []))}")
+
+for i, crate in enumerate(result.get('crates', [])):
+    print(f"\n  Crate {i+1}:")
+    print(f"    ID: {crate.get('crate_id')}")
+    print(f"    Layer: {crate.get('layer')}")
+    print(f"    Position: Rx={crate.get('Rx', 0):.1f}, Ry={crate.get('Ry', 0):.1f}, Rz={crate.get('Rz', 0):.1f}")
+    print(f"    Orientation: theta={crate.get('theta', 0):.3f}")
+    print(f"    AI Classification: {crate.get('ai_classification')}")
