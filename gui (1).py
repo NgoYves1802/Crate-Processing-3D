@@ -29,12 +29,21 @@ Usage
     from crate_vision.gui import launch
     launch()
 """
-
 from __future__ import annotations
-
-import json
+# gui (1).py — FIRST LINES, before ANY other imports
 import os
 import sys
+
+# Windows DLL hell fix: Preload torch before Qt can interfere
+if sys.platform == 'win32':
+    try:
+        import torch
+        print(f"Preloaded torch: {torch.__version__}")
+    except Exception:
+        pass  # Will handle in ai_verifier
+
+
+import json
 import threading
 from pathlib import Path
 
