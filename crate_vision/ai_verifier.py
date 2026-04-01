@@ -125,19 +125,41 @@ class CrateVerifier:
 
     @staticmethod
     def _load_pytorch_model(pth_path: str, num_classes: int):
-        model = densenet121(weights=None)
-        in_features = model.classifier.in_features
-        model.classifier = nn.Sequential(
-            nn.Dropout(p=0.5),
-            nn.Linear(in_features, 256),
-            nn.ReLU(inplace=True),
-            nn.BatchNorm1d(256),
-            nn.Dropout(p=0.3),
-            nn.Linear(256, num_classes),
-        )
         device = "cuda" if (_TORCH_AVAILABLE and torch.cuda.is_available()) else "cpu"
         state_dict = torch.load(pth_path, map_location=device)
-        model.load_state_dict(state_dict)
+        
+        # Check if this is a full model (with 'features.' keys) or just classifier
+        has_full_model = any(k.startswith('features.') for k in state_dict.keys())
+        
+        if has_full_model:
+            # Full model saved - load entire DenseNet-121
+            model = densenet121(weights=None)
+            # Replace classifier with our custom head
+            in_features = model.classifier.in_features
+            model.classifier = nn.Sequential(
+                nn.Dropout(p=0.5),
+                nn.Linear(in_features, 256),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm1d(256),
+                nn.Dropout(p=0.3),
+                nn.Linear(256, num_classes),
+            )
+            # Load only matching keys (features + our classifier)
+            model.load_state_dict(state_dict, strict=False)
+        else:
+            # Only classifier saved - use new architecture and load weights
+            model = densenet121(weights=None)
+            in_features = model.classifier.in_features
+            model.classifier = nn.Sequential(
+                nn.Dropout(p=0.5),
+                nn.Linear(in_features, 256),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm1d(256),
+                nn.Dropout(p=0.3),
+                nn.Linear(256, num_classes),
+            )
+            model.load_state_dict(state_dict)
+        
         model.eval()
         model.to(device)
         return model
